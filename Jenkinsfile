@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/your-username/price-scanner-app.git'
+                git credentialsId: 'Github', url: 'https://github.com/your-username/price-scanner-app.git', branch: 'main'
             }
         }
 

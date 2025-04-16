@@ -15,7 +15,7 @@ pipeline {
         stage('Build Scraper Docker Image') {
             steps {
                 dir('scraper') {
-                    sh 'docker build -t price-scanner-scraper .'
+                    bat 'docker build -t price-scanner-scraper .'
                 }
             }
         }
@@ -23,9 +23,9 @@ pipeline {
         stage('Build Android Docker Image & APK') {
             steps {
                 dir('android-app') {
-                    sh '''
+                    bat '''
                         docker build -t price-scanner-android .
-                        docker run --rm -v $PWD:/output price-scanner-android cp /workspace/app/build/outputs/apk/debug/app-debug.apk /output/
+                        docker run --rm -v "%cd%:/output" price-scanner-android powershell -Command "Copy-Item -Path '/workspace/app/build/outputs/apk/debug/app-debug.apk' -Destination '/output/'"
                     '''
                 }
             }
@@ -34,12 +34,12 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh '''
-                        echo "$PASS" | docker login -u "$USER" --password-stdin
-                        docker tag price-scanner-scraper $USER/price-scanner-scraper:latest
-                        docker tag price-scanner-android $USER/price-scanner-android:latest
-                        docker push $USER/price-scanner-scraper:latest
-                        docker push $USER/price-scanner-android:latest
+                    bat '''
+                        echo %PASS% | docker login -u %USER% --password-stdin
+                        docker tag price-scanner-scraper %USER%/price-scanner-scraper:latest
+                        docker tag price-scanner-android %USER%/price-scanner-android:latest
+                        docker push %USER%/price-scanner-scraper:latest
+                        docker push %USER%/price-scanner-android:latest
                     '''
                 }
             }
@@ -48,9 +48,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 withKubeConfig([credentialsId: 'k8s-config']) {
-                    sh '''
-                        kubectl apply -f k8s/
-                    '''
+                    bat 'kubectl apply -f k8s\\'
                 }
             }
         }
@@ -58,7 +56,7 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'android-app/app/build/outputs/apk/debug/app-debug.apk', fingerprint: true
+            archiveArtifacts artifacts: 'android-app\\app\\build\\outputs\\apk\\debug\\app-debug.apk', fingerprint: true
         }
     }
 }

@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: android-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: android
+  template:
+    metadata:
+      labels:
+        app: android
+    spec:
+      containers:
+        - name: android
+          image: saki2726/price-scanner-android:latest

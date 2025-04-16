@@ -1,11 +1,9 @@
-# Base image
 FROM python:3.10-slim
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install dependencies
+# Install Chrome dependencies + Chrome
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -29,30 +27,26 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     libu2f-udev \
     libvulkan1 \
-    google-chrome-stable \
+    && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-linux-signing-keyring.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver (make sure version matches Chrome)
+# Install ChromeDriver
 RUN wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/119.0.6045.105/chromedriver_linux64.zip && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     chmod +x /usr/local/bin/chromedriver && \
     rm /tmp/chromedriver.zip
 
-# Set display port to avoid errors
 ENV DISPLAY=:99
 
-# Set working directory
 WORKDIR /app
 
-# Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app code
 COPY . .
 
-# Expose port for FastAPI
 EXPOSE 8000
 
-# Run the FastAPI app
 CMD ["uvicorn", "scrape:app", "--host", "0.0.0.0", "--port", "8000"]

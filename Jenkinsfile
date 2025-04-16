@@ -14,7 +14,7 @@ pipeline {
 
         stage('Build Scraper Docker Image') {
             steps {
-                dir('scraper') {
+                dir('scrapper') {
                     bat 'docker build -t price-scanner-scraper .'
                 }
             }
@@ -22,7 +22,7 @@ pipeline {
 
         stage('Build Android Docker Image & APK') {
             steps {
-                dir('android-app') {
+                dir('MyApplication') {
                     bat '''
                         docker build -t price-scanner-android .
                         docker run --rm -v "%cd%:/output" price-scanner-android powershell -Command "Copy-Item -Path '/workspace/app/build/outputs/apk/debug/app-debug.apk' -Destination '/output/'"

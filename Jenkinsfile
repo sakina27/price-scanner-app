@@ -22,12 +22,12 @@ pipeline {
 
         stage('Build Android Docker Image & APK') {
             steps {
-                dir('Pricescanner') {
-                    bat '''
-                        docker build -t price-scanner-android ./MyApplication
-                        docker run --rm -v "%cd%:/output" price-scanner-android sh -c "cp /workspace/app/build/outputs/apk/debug/app-debug.apk /output/"
-                    '''
-                }
+                
+                bat '''
+                    docker build -t price-scanner-android ./MyApplication
+                    docker run --rm -v "%cd%:/output" price-scanner-android sh -c "cp /workspace/app/build/outputs/apk/debug/app-debug.apk /output/"
+                '''
+               
             }
         }
 

@@ -32,9 +32,9 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     bat """
-                        echo %PASS% > docker_pass.txt
+                        echo Logging into Docker Hub...
+                        docker logout
                         docker login -u %USER% -p %PASS%
-                        del docker_pass.txt
 
                         docker tag price-scanner-scraper %USER%/price-scanner-scraper:latest
                         docker tag price-scanner-android %USER%/price-scanner-android:latest
@@ -57,7 +57,7 @@ pipeline {
 
     post {
         always {
-            // After the APK is created inside the Android container and saved to host via a volume
+            // Adjust path if your container copies APK to a shared volume mapped here
             archiveArtifacts artifacts: 'MyApplication\\app\\build\\outputs\\apk\\debug\\app-debug.apk', fingerprint: true
         }
     }

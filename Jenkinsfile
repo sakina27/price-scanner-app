@@ -20,14 +20,9 @@ pipeline {
             }
         }
 
-        stage('Build Android Docker Image & APK') {
+        stage('Build Android Docker Image') {
             steps {
-                
-                bat '''
-                    docker build -t price-scanner-android ./MyApplication
-                    docker run --rm -v "%cd%:/output" price-scanner-android sh -c "cp /workspace/app/build/outputs/apk/debug/app-debug.apk /output/"
-                '''
-               
+                bat 'docker build -t price-scanner-android ./MyApplication'
             }
         }
 
@@ -52,11 +47,28 @@ pipeline {
                 }
             }
         }
+
+        stage('Fetch APK from Kubernetes') {
+            steps {
+                script {
+                    withKubeConfig([credentialsId: 'k8s-config']) {
+                        def podName = bat(
+                            script: 'kubectl get pods -l app=price-scanner-android -o=jsonpath="{.items[0].metadata.name}"',
+                            returnStdout: true
+                        ).trim().replace('"', '')
+
+                        bat "kubectl wait --for=condition=ready pod/${podName} --timeout=180s"
+                        bat "kubectl exec ${podName} -- sh -c \"./gradlew assembleDebug\""
+                        bat "kubectl cp ${podName}:/workspace/app/build/outputs/apk/debug/app-debug.apk app-debug.apk"
+                    }
+                }
+            }
+        }
     }
 
     post {
         always {
-            archiveArtifacts artifacts: 'android-app\\app\\build\\outputs\\apk\\debug\\app-debug.apk', fingerprint: true
+            archiveArtifacts artifacts: 'app-debug.apk', fingerprint: true
         }
     }
 }

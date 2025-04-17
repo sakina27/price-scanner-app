@@ -8,9 +8,9 @@ RUN wget https://services.gradle.org/distributions/gradle-7.5-bin.zip && \
     unzip gradle-7.5-bin.zip -d /opt/ && \
     ln -s /opt/gradle-7.5/bin/gradle /usr/bin/gradle
 
-# Setup Android SDK environment
-ENV ANDROID_HOME /opt/android-sdk
-ENV PATH ${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/build-tools/30.0.3
+ENV ANDROID_HOME=/opt/android-sdk
+ENV PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+
 
 # Install Android command line tools
 RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
@@ -30,6 +30,9 @@ WORKDIR /workspace
 
 # Copy project files into container
 COPY . .
+
+RUN apt-get install -y dos2unix && dos2unix ./gradlew
+
 
 # Build APK
 RUN ./gradlew clean assembleDebug

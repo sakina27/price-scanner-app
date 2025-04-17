@@ -19,4 +19,6 @@ COPY . .
 
 # Build APK
 RUN chmod +x ./gradlew
-RUN ./gradlew clean assembleDebug
+RUN gradle clean assembleDebug
+
+RUN find . > /workspace/tree.txt

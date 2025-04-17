@@ -25,7 +25,7 @@ pipeline {
                 dir('MyApplication') {
                     bat '''
                         docker build -t price-scanner-android .
-                        docker run --rm -v "%cd%:/output" price-scanner-android powershell -Command "Copy-Item -Path '/workspace/app/build/outputs/apk/debug/app-debug.apk' -Destination '/output/'"
+                        docker run --rm -v "%cd%:/output" price-scanner-android sh -c "cp /workspace/app/build/outputs/apk/debug/app-debug.apk /output/"
                     '''
                 }
             }

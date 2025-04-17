@@ -24,7 +24,7 @@ pipeline {
             steps {
                 dir('MyApplication') {
                     bat '''
-                        docker build -t price-scanner-android .
+                        docker build --build-arg ANDROID_SDK_PATH="C:/Android" -t price-scanner-android .
                         docker run --rm -v "%cd%:/output" price-scanner-android sh -c "cp /workspace/app/build/outputs/apk/debug/app-debug.apk /output/"
                     '''
                 }

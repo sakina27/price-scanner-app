@@ -19,6 +19,4 @@ COPY . .
 
 # Build APK
 RUN chmod +x ./gradlew
-RUN gradle clean assembleDebug
-
-RUN find . > /workspace/tree.txt
+CMD ["./gradlew", "assembleDebug"]

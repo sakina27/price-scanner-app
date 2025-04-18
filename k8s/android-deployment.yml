@@ -14,4 +14,4 @@ spec:
     spec:
       containers:
         - name: android
-          image: saki2726/price-scanner-android:latest
+          image: sakina2726/price-scanner-android:latest

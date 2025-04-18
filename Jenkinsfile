@@ -15,10 +15,11 @@ pipeline {
         stage('Build Scraper Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    script {
+                    bat """
                         // Docker login for pulling base images
-                        sh 'docker login -u $USER -p $PASS'
-                    }
+                        docker login -u $USER -p $PASS
+						docker info
+                    """
                 }
                 dir('scrapper') {
                     bat 'docker build -t price-scanner-scraper .'

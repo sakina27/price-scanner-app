@@ -14,6 +14,12 @@ pipeline {
 
         stage('Build Scraper Docker Image') {
             steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    script {
+                        // Docker login for pulling base images
+                        sh 'docker login -u $USER -p $PASS'
+                    }
+                }
                 dir('scrapper') {
                     bat 'docker build -t price-scanner-scraper .'
                 }
@@ -57,7 +63,6 @@ pipeline {
 
     post {
         always {
-            // Adjust path if your container copies APK to a shared volume mapped here
             archiveArtifacts artifacts: 'MyApplication\\app\\build\\outputs\\apk\\debug\\app-debug.apk', fingerprint: true
         }
     }

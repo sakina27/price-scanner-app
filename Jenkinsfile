@@ -12,13 +12,20 @@ pipeline {
             }
         }
 
+        🟨stage('Build APK') {
+            steps {
+                dir('MyApplication') {
+                    bat '.\\gradlew assembleDebug'
+                }
+            }
+        }🟨
+
         stage('Build Scraper Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     bat """
-                        // Docker login for pulling base images
                         docker login -u $USER -p $PASS
-						docker info
+                        docker info
                     """
                 }
                 dir('scrapper') {
@@ -57,11 +64,11 @@ pipeline {
             steps {
                 withKubeConfig([credentialsId: 'k8s-config']) {
                     bat '''
-						kubectl config view
-						kubectl cluster-info
-						kubectl get nodes
-						kubectl apply -f k8s\\ --validate=false
-					'''
+                        kubectl config view
+                        kubectl cluster-info
+                        kubectl get nodes
+                        kubectl apply -f k8s\\ --validate=false
+                    '''
                 }
             }
         }

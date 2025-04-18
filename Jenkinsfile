@@ -56,7 +56,12 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 withKubeConfig([credentialsId: 'k8s-config']) {
-                    bat 'kubectl apply -f k8s\\'
+                    bat '''
+						kubectl config view
+						kubectl cluster-info
+						kubectl get nodes
+						kubectl apply -f k8s\\ --validate=false
+					'''
                 }
             }
         }

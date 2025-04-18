@@ -12,13 +12,13 @@ pipeline {
             }
         }
 
-        🟨stage('Build APK') {
+        stage('Build APK') {
             steps {
                 dir('MyApplication') {
                     bat '.\\gradlew assembleDebug'
                 }
             }
-        }🟨
+        }
 
         stage('Build Scraper Docker Image') {
             steps {
